@@ -2,10 +2,10 @@ class Level:
 
     def __init__(self, name, a, b, alpha, beta):
         self.name = name
-        self.beta = beta
-        self.alpha = alpha
-        self.b = b
-        self.a = a
+        self.beta = float(beta)
+        self.alpha = float(alpha)
+        self.b = float(b)
+        self.a = float(a)
 
     def get_abcd(self):
         a = self.a - self.alpha
