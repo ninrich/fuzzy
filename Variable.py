@@ -23,11 +23,11 @@ class Variable:
             antecedent[name] = fuzz.trapmf(antecedent.universe, level.get_abcd())
         return antecedent
 
-    def create_consequent(self):
+    def create_consequent(self, defuzz_method='centroid'):
         graph_min_value = 0
         graph_max_value = self.get_maximum_value()
         graph_step = 1
-        consequent = ctrl.Consequent(np.arange(graph_min_value, graph_max_value, graph_step), self.name)
+        consequent = ctrl.Consequent(np.arange(graph_min_value, graph_max_value, graph_step), self.name, defuzzify_method=defuzz_method)
         for level in self.levels:
             name = level.get_name()
             consequent[name] = fuzz.trapmf(consequent.universe, level.get_abcd())
@@ -35,7 +35,7 @@ class Variable:
 
     def get_maximum_value(self):
         """
-        Returns the maximum value of all levels. Useful for determining the scale of the grapgh
+        Returns the maximum value of all levels. Useful for determining the scale of the graph
         """
         current_max = 0
         for level in self.levels:

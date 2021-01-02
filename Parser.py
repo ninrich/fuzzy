@@ -5,7 +5,7 @@ from skfuzzy import control as ctrl
 
 class Parser:
 
-    def __init__(self, filename):
+    def __init__(self, filename, defuzz_method):
         with open(filename, 'r') as file:
             # remove newline characters
             all_lines = [line.strip() for line in file.readlines()]
@@ -13,9 +13,13 @@ class Parser:
             # remove empty lines
             self.all_lines = [line for line in all_lines[1:] if len(line) > 0]
 
+        self.defuzz_method = defuzz_method
         self.rules = []
         self.values = {}
         self.variables = {}
+        self.antecedents = {}
+        self.consequents = {}
+        self.parse()
 
     def parse(self):
         rules = []
@@ -28,7 +32,7 @@ class Parser:
                 values.append(line)
             else:
                 variables.append(line)
-        
+
         self.parse_values(values)
         self.parse_variables(variables)
         self.parse_rules(rules)
@@ -66,7 +70,6 @@ class Parser:
             name = operands[0]
             value = operands[1]
             self.values[name] = int(value)
-        print(self.values)
 
     def parse_variables(self, input):
         current_levels = []
@@ -79,14 +82,26 @@ class Parser:
                 self.variables[variable_name] = Variable(variable_name, current_levels)
                 current_levels = []
 
-    def parse_levels(self, level_line):
-        level_line.split()
-
     def get_antecedent(self, antecedent_name):
-        return self.variables[antecedent_name].create_antecedent()
+        # create new antecedent if it does not already exist
+        if antecedent_name not in self.antecedents:
+            self.antecedents[antecedent_name] = self.variables[antecedent_name].create_antecedent()
+        return self.antecedents[antecedent_name]
 
     def get_consequent(self, consequent_name):
-        return self.variables[consequent_name].create_consequent()
+        # create new consequent if it does not already exist
+        if consequent_name not in self.consequents:
+            self.consequents[consequent_name] = self.variables[consequent_name].create_consequent(self.defuzz_method)
+        return self.consequents[consequent_name]
 
-if __name__ == '__main__':
-    Parser("example.txt").parse()
+    def get_rules(self):
+        return self.rules
+
+    def get_values(self):
+        return self.values
+
+    def get_all_antecedents(self):
+        return self.antecedents.items()
+
+    def get_all_consequents(self):
+        return self.consequents.keys()
